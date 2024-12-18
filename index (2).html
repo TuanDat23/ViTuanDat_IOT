@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dữ Liệu Nhiệt Độ và Độ Ẩm</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .data-box { margin: 20px 0; padding: 10px; border: 1px solid #ddd; }
+        table { width: 100%; border-collapse: collapse; }
+        table, th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Dữ Liệu Nhiệt Độ và Độ Ẩm</h1>
+
+    <!-- Nhiệt độ và Độ Ẩm Hiện Tại -->
+    <div class="data-box">
+        <h3>Nhiệt Độ và Độ Ẩm Hiện Tại</h3>
+        <p id="temperature">Đang tải...</p>
+        <p id="humidity">Đang tải...</p>
+    </div>
+
+    <!-- Nhiệt Độ Tối Ưu (T_cap_nhat) và Thời Gian -->
+    <div class="data-box">
+        <h3>Nhiệt Độ Tối Ưu (T_cap_nhat)</h3>
+        <p id="optimized_temperature">Đang tải...</p>
+        <p id="timestamp">Đang tải...</p>
+    </div>
+
+    <!-- Bảng Lịch Sử -->
+    <h3>5 Nhiệt Độ Tối Ưu Gần Nhất</h3>
+    <table id="history-table">
+        <thead>
+            <tr>
+                <th>Nhiệt Độ</th>
+                <th>Thời Gian</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Các hàng lịch sử sẽ được thêm vào ở đây -->
+        </tbody>
+    </table>
+
+    <script>
+        function fetchData() {
+            fetch('/get_data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('temperature').textContent = "Nhiệt Độ: " + data.temperature + " °C";
+                    document.getElementById('humidity').textContent = "Độ Ẩm: " + data.humidity + " %";
+                    document.getElementById('optimized_temperature').textContent = "Nhiệt Độ Tối Ưu: " + data.optimized_temperature + " °C";
+                    document.getElementById('timestamp').textContent = "Thời Gian: " + data.timestamp;
+                });
+
+            fetch('/get_history')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.querySelector('#history-table tbody');
+                    tbody.innerHTML = '';  // Xóa các hàng cũ
+                    data.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `<td>${row.temperature} °C</td><td>${row.timestamp}</td>`;
+                        tbody.appendChild(tr);
+                    });
+                });
+        }
+
+        // Lấy dữ liệu mỗi 5 giây
+        setInterval(fetchData, 5000);
+
+        // Lấy dữ liệu ban đầu
+        fetchData();
+    </script>
+</body>
+</html>
